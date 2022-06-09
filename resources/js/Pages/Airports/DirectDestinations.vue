@@ -35,7 +35,7 @@
                 </template>
                 <template v-else>
                     <tr>
-                        <td v-for="i in 4"> {{ loading ? 'Loading...' : 'NO DATA' }}</td>
+                        <td v-for="i in 4" :key="'d' + i"> {{ loading ? 'Loading...' : 'NO DATA' }}</td>
                     </tr>
                 </template>
             </tbody>
@@ -72,10 +72,15 @@ const fetchData = async () => {
     if (errors.value.length > 0) return
     loading.value = true
     airportDirectDestinations.value = { data: [] }
-    airportDirectDestinations.value = await amadeus.fetchAirportDirectDestinations(params.value)
-    amadeus.$patch({
-       airportDirectDestinations: await amadeus.fetchAirportDirectDestinations(params.value)
-    })
+    let res = null
+    try {
+        res = await amadeus.fetchAirportDirectDestinations(params.value)
+    } catch (error) {
+        errors.value.push('Please try again')
+    }
+    if (res) {
+        airportDirectDestinations.value = res
+    }
     loading.value = false
 }
 
